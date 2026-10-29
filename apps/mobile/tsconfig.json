@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-native",
+    "lib": ["DOM", "ESNext"],
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "composite": false
+  },
+  "include": [
+    "src/**/*",
+    "App.tsx",
+    "index.ts"
+  ]
+}
+

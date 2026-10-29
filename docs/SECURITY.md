@@ -1,29 +1,34 @@
 # Keamanan Mobile Client dan Backend
 
-Status: baseline rekomendasi; audit source code belum dilakukan.
+Status: Diperbarui & Diterapkan pada Fondasi Monorepo (2026-10-29).
 
-## Prinsip
-- Anggap semua input dari mobile client tidak tepercaya.
-- Validasi request di backend dan otorisasi setiap akses resource privat/mutasi.
-- Jangan menaruh server secret, private key, database credential atau token permanen di bundle Expo.
-- Gunakan HTTPS di lingkungan non-local.
-- Jangan kirim stack trace atau detail internal pada response produksi.
-- Jangan log password, token, secret atau data personal yang tidak dibutuhkan.
+## 1. Prinsip Keamanan Utama
 
-## Auth/session
-Jika akun digunakan, dokumentasikan strategy auth, expiry, refresh/revocation, secure local storage, logout, pemulihan akun dan brute-force protection. Jangan mengasumsikan provider/library sebelum audit.
+1. **Zero Trust pada Client Input**:
+   - Seluruh input dan payload dari mobile client dianggap tidak tepercaya.
+   - Skor, damage, eliminasi, dan validasi pergerakan tidak boleh dipercayakan kepada client.
+2. **Pencegahan Kebocoran Secret**:
+   - Dilarang menaruh database credential, private key, secret tokens, atau API admin keys pada bundle Expo mobile.
+   - Variabel `EXPO_PUBLIC_*` hanya digunakan untuk endpoint publik (misalnya URL backend publik).
+3. **Penyembunyian Detail Internal (No Stack Leak)**:
+   - Server tidak mengekspos stack trace atau error internal pada response HTTP (terutama saat `NODE_ENV=production`).
+4. **Sanitasi Logging**:
+   - Dilarang mencetak password, token, header Authorization, atau data personal (PII) ke console/log server.
 
-## Game integrity
-Jika skor, reward, inventory, saldo atau ranking kompetitif berlaku, validasi perubahan sensitif di server. Pertimbangkan replay, race condition, idempotency, rate limits dan audit trail.
+---
 
-## Privacy
-Kumpulkan data seperlunya. Tentukan tujuan, akses, retensi, backup dan penghapusan. Jangan memasukkan token/data personal ke log, telemetry, screenshot atau dokumentasi.
+## 2. Kontrol Keamanan yang Telah Diterapkan (Fase Fondasi)
 
-## Runtime hardening
-Audit CORS, rate limit, body limits, validation, security headers, dependency advisories, upload handling jika ada, database permissions, error handling, logging dan graceful shutdown.
+- **Helmet**: Dipasang pada middleware Express untuk menyetel security headers HTTP standar (XSS filter, noSniff, frameguard, dll.).
+- **CORS Terkendali**: Middleware CORS dikonfigurasi melalui variabel environment `CORS_ORIGIN` (bukan hardcoded).
+- **Body Parser Payload Limit**: `express.json({ limit: '10kb' })` membatasi ukuran request body untuk mencegah serangan Denial of Service berbasis memory exhaustion.
+- **Validasi Port & Environment**: Saat server start, konfigurasi divalidasi oleh `loadConfig()` untuk mencegah miskonfigurasi runtime.
+- **Centralized Error Handler**: Seluruh exception yang tidak tertangani ditangkap dan diformat menjadi pesan JSON aman (`500 Internal Server Error`).
 
-## Secret management
-Simpan secret pada environment runtime/secret store. .env.example hanya memuat nama variabel aktual dan placeholder. Jika credential pernah terpublikasi, rencanakan rotasi melalui proses terotorisasi.
+---
 
-## Incident response
-Dokumentasikan identifikasi dampak, pencabutan credential, pemulihan layanan, preservasi bukti dan laporan insiden. Jangan mengubah produksi tanpa otorisasi.
+## 3. Kontrol Keamanan Tahap Selanjutnya (TBD)
+
+- **Rate Limiting**: Penerapan rate limiter (seperti `express-rate-limit`) pada route publik.
+- **Otentikasi & Otorisasi**: Verifikasi token JWT / Bearer pada endpoint mutasi privat.
+- **WebSocket Handshake Validation**: Validasi token dan rate limit event per socket connection.

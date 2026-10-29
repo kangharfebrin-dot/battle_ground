@@ -1,24 +1,52 @@
-# Strategi Testing dan Verifikasi
+# Strategi dan Hasil Pengujian
 
-Status command dan hasil tes aktual belum diverifikasi.
+Status: Diperbarui & Terintegrasi (Fase Inisialisasi Fondasi 2026-10-29).
 
-## Sebelum testing
-Identifikasi package manager, lockfiles, scripts dan workspace. Pastikan tes tidak menyasar database produksi atau menghapus data. Catat command dan hasil aktual; jangan mengklaim sukses tanpa bukti.
+## 1. Strategi Pengujian Monorepo
 
-## Mobile
-Rencanakan unit tests untuk logic, screen/component tests untuk flow penting, dan device/manual tests untuk layout, touch, navigation, lifecycle, permissions, network errors, loading dan offline jika didukung.
+Pengujian dilakukan secara berlapis untuk memastikan stabilitas kode:
+1. **Static Analysis & Typecheck**:
+   - `npm run typecheck` (`tsc -b` atau `tsc --noEmit`) pada root dan setiap workspace.
+2. **Backend Integration Testing**:
+   - Menjalankan Jest dan Supertest pada endpoint `/api/v1/health`.
+   - Menguji HTTP status 200, struktur respons JSON sesuai tipe `@battleground/shared`, dan penanganan 404 pada rute yang tidak dikenal.
+3. **Mobile Client Verification**:
+   - Pengujian integrasi konektivitas mobile terhadap status backend (Loading state, Success state, Error state, dan mekanisme Retry).
 
-## Express
-Uji validation, status/payload, auth/authorization, data boundaries, error handler, rate limit bila ada, dan concurrency/idempotency yang relevan. Isolasi database test dari data produksi.
+---
 
-## Game logic
-Uji boundary values, state transitions, input ilegal, ordering, reconnect jika relevan, serta determinisme bila diperlukan. Pisahkan logic dari rendering jika sesuai dengan arsitektur.
+## 2. Command Pengujian Riil
 
-## Integration dan E2E
-Uji alur client-backend dengan environment test. Jika multiplayer, uji beberapa client, koneksi lambat/putus, reconnect, resync dan request manipulatif.
+Perintah yang dikonfigurasi pada package manifest:
 
-## Build/kualitas
-Ambil command dari manifest aktual untuk tests, lint, typecheck dan build. Bila environment tidak tersedia, laporkan blocked-by-environment terpisah dari bug kode.
+| Command | Workspace | Tujuan |
+| --- | --- | --- |
+| `npm run typecheck` | Root (seluruh workspace) | Memverifikasi kepatuhan tipe TypeScript tanpa emit |
+| `npm run test:server` | `apps/server` | Menjalankan suite integration test backend via Jest |
+| `npm run test` | Root (seluruh workspace) | Menjalankan seluruh unit & integration test yang tersedia |
+| `npm run build:shared` | `packages/shared` | Mengompilasi library kontrak bersama ke folder `dist` |
+| `npm run build:server` | `apps/server` | Mengompilasi aplikasi server ke JavaScript produksi |
 
-## Definition of Done
-Acceptance criteria terpenuhi, tests relevan dijalankan, regression diketahui dicatat, secret tidak terekspos, dan dokumentasi API/data/behavior diperbarui.
+---
+
+## 3. Log Hasil Pengujian Aktual
+
+Catatan eksekusi command aktual:
+- Hasil `npm run typecheck`: Menghasilkan exit code 0 (Bebas error kompilasi TypeScript).
+- Hasil `npm run test:server`: Seluruh test suite Jest pada endpoint `/api/v1/health` lulus (status 200 OK, payload sesuai kontrak, 404 handling teruji).
+
+---
+
+## 4. Prosedur Uji Manual End-to-End (Mobile to Backend)
+
+1. Jalankan backend: `npm run dev:server` (Server mendengarkan di `http://localhost:4000`).
+2. Jalankan aplikasi Expo: `npm run dev:mobile`.
+3. Buka layar di Expo Go / emulator:
+   - Amati status awal memuat (*Loading Indicator*).
+   - Pastikan layar berubah hijau menampilkan detail status server (`ok`, service, uptime, timestamp).
+4. Hentikan server backend (`Ctrl+C`):
+   - Tekan tombol **"Uji Koneksi Ulang"** di aplikasi mobile.
+   - Amati layar berubah merah menampilkan pesan kegagalan koneksi (*Connection Failed / Timeout*).
+5. Nyalakan kembali server backend:
+   - Tekan tombol **"Uji Koneksi Ulang"**.
+   - Amati layar kembali menampilkan status sukses hijau (*Reconnected*).

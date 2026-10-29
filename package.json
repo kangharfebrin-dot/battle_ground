@@ -1,0 +1,26 @@
+{
+  "name": "battleground-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/shared",
+    "apps/server",
+    "apps/mobile"
+  ],
+  "scripts": {
+    "build:shared": "npm run build --workspace=packages/shared",
+    "build:server": "npm run build --workspace=apps/server",
+    "build": "npm run build:shared && npm run build:server",
+    "dev:server": "npm run dev --workspace=apps/server",
+    "dev:mobile": "npm run start --workspace=apps/mobile",
+    "start:server": "npm run start --workspace=apps/server",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test:server": "npm run test --workspace=apps/server",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
+

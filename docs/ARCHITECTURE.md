@@ -1,38 +1,89 @@
 # Arsitektur Sistem
 
-Status: draft konseptual, perlu dicocokkan dengan repo aktual.
+Status: Baseline Arsitektur Terkonfirmasi (Diperbarui 2026-10-29).
 
-## Fakta
-Stack yang diminta adalah React Native Expo dan Express. Monorepo/dua repo, JS/TS, protokol, database, ORM, layanan eksternal, autentikasi, realtime dan hosting belum diketahui.
+## 1. Fakta Arsitektur Terverifikasi
 
-## Alur tingkat tinggi
-Mobile client (React Native Expo) berkomunikasi dengan Express melalui protokol yang belum diverifikasi. Persistence dan layanan eksternal hanya dimasukkan jika dibutuhkan dan ditemukan/disetujui.
+- **Struktur Monorepo**: Menggunakan npm workspaces resmi (`apps/mobile`, `apps/server`, `packages/shared`).
+- **Stack Terpilih**:
+  - **Mobile**: React Native + Expo (TypeScript).
+  - **Backend**: Express (Node.js) + TypeScript.
+  - **Shared Contract**: `@battleground/shared` (TypeScript library).
+- **Transport Komunikasi**:
+  - **REST API**: Endpoint `/api/v1/*` untuk administrasi, profile, dan health check.
+  - **Socket.IO** (Fase berikutnya): Transport realtime bi-directional untuk game loop sinkron.
+- **Runtime Lingkungan Host**: Node.js `v24.20.0`, npm `11.19.0` (Windows).
 
-## Audit mobile
-Telusuri entrypoint, navigation, screens, reusable components, asset pipeline, state, local storage, app lifecycle, Expo config, native modules, permissions dan API client. Jangan menambahkan library sebelum memeriksa yang sudah digunakan.
+## 2. Struktur Monorepo Aktual
 
-## Audit backend
-Periksa entrypoint, registered routers, middleware, validation, auth, authorization, CORS, rate limiting, service/repository jika ada, database initialization, error handler, logging, health check dan graceful shutdown.
+```text
+battleground/
+├── package.json               # Root monorepo workspace manifest
+├── tsconfig.json              # Base TypeScript configuration
+├── .gitignore                 # Dependency, build outputs, environment ignores
+├── .env.example               # Template environment variables (non-secret)
+├── README.md                  # Dokumentasi panduan operasional proyek
+├── CHANGELOG.md               # Catatan rilis dan evolusi dokumentasi/fitur
+├── AGENTS.md                  # Panduan integritas dan instruksi AI agent
+├── PRD.md                     # Product Requirements Document
+├── apps/
+│   ├── mobile/                # React Native Expo Client
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   ├── app.json           # Konfigurasi Expo
+│   │   ├── App.tsx            # Layar inisial (Health Connectivity & Retry)
+│   │   └── src/
+│   │       └── config/        # API Base URL & environment config
+│   └── server/                # Express Backend Service
+│       ├── package.json
+│       ├── tsconfig.json
+│       ├── src/
+│       │   ├── config/        # Validasi environment & port binding
+│       │   ├── controllers/   # Request handler (Healthcheck controller)
+│       │   ├── middleware/    # Helmet, CORS, Error Handler terpusat
+│       │   ├── routes/        # Router modular `/api/v1/*`
+│       │   ├── app.ts         # Inisialisasi Express Application
+│       │   └── server.ts      # Server entrypoint & graceful shutdown
+│       └── tests/             # Supertest & Jest integration tests
+├── packages/
+│   └── shared/                # Tipe Data Bersama & Kontrak DTO
+│       ├── package.json
+│       ├── tsconfig.json
+│       └── src/
+│           ├── index.ts       # Main export
+│           └── contracts/     # Health contract & status responses
+└── docs/                      # Dokumentasi teknis, audit, dan tata kelola
+```
 
-## Realtime/game state
-Realtime belum dikonfirmasi. Jika game real-time multiplayer, desain protokol, server authority, update rate, ordering, latency budget, reconnect, state resync dan validasi aksi sebelum memilih teknologi. Jangan mengasumsikan WebSocket atau Socket.IO tersedia.
+## 3. Pemisahan Tanggung Jawab (Separation of Concerns)
 
-## Prinsip desain
-- UI menangani input dan presentasi state.
-- Server memvalidasi request dan aturan yang memengaruhi integritas hasil.
-- Data kompetitif tidak boleh bergantung pada klaim client saja.
-- API dan pesan harus terversi, konsisten, serta diuji.
-- Minimalkan data pribadi dan batasi akses.
+### A. Mobile Client (`apps/mobile`)
+- Menangani input interaktif pengguna: Dual Virtual Joystick (translasi posisi dan arah bidik tembak).
+- Menampilkan HUD responsif: HP bar, ammo count, ping latency, dan status server.
+- Mengelola state transisi koneksi: loading, connected, connection failed, retrying.
+- Mengirimkan hanya vektor pergerakan dan trigger aksi ke backend.
+- **Prinsip Keamanan Klien**:
+  - Dilarang menyimpan credentials database, private keys, atau JWT secret di client bundle.
+  - Nilai variabel `EXPO_PUBLIC_*` hanya digunakan untuk URL endpoint publik yang aman dilihat umum.
 
-## Keputusan terbuka
-| Keputusan | Status | Dampak |
-|---|---|---|
-| Monorepo atau repo terpisah | TBD | Workspace dan CI |
-| JavaScript atau TypeScript | TBD | Type safety dan tooling |
-| REST, realtime atau campuran | TBD | Kontrak jaringan |
-| Database/ORM | TBD | Persistence dan migration |
-| Model simulasi game | TBD | Fairness dan latency |
-| Auth/session | TBD | Identitas dan akses |
-| Observability/hosting | TBD | Operasi produksi |
+### B. Express Backend (`apps/server`)
+- Mengontrol seluruh otoritas state pertandingan (Server-Authoritative): validasi posisi pemain, deteksi hit peluru, deduksi HP, eliminasi, dan skor kemenangan.
+- Menyediakan endpoint RESTful berstruktur envelope konsisten:
+  - `GET /api/v1/health`
+- Menerapkan security hardening:
+  - `helmet` untuk security response headers.
+  - `cors` dengan origin terkonfigurasi.
+  - Body-parser JSON dengan limit ketat (`10kb`) guna mencegah payload exhaustion.
+  - Error middleware terpusat yang tidak membocorkan internal stack trace di mode production.
+  - Graceful shutdown menangani sinyal `SIGTERM` dan `SIGINT`.
 
-Keputusan arsitektur besar dicatat dengan konteks, pilihan, keputusan, konsekuensi dan tanggal.
+### C. Shared Package (`packages/shared`)
+- Bertindak sebagai single source of truth untuk kontrak API dan DTO antara server dan mobile.
+- Menghindari duplikasi tipe TypeScript antara backend dan client Expo.
+- Tidak menyertakan logika runtime berlebih atau dependensi eksternal yang tidak diperlukan.
+
+## 4. Pola Jaringan & Alamat API
+- **iOS Simulator**: Mengakses backend melalui `http://localhost:4000`.
+- **Android Emulator**: Mengakses backend host machine melalui alias loopback `http://10.0.2.2:4000`.
+- **Perangkat Fisik (Expo Go / Development Build)**: Mengakses backend melalui IP LAN komputer pengembang (misalnya `http://192.168.x.x:4000`).
+- **Server Production / Staging**: Mengakses URL resmi domain HTTPS.

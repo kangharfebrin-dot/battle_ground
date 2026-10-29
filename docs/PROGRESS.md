@@ -1,24 +1,29 @@
 # Status Proyek dan Dokumentasi
 
-Pembaruan: 2026-10-27.
+Pembaruan Terakhir: 2026-10-29
+
+## Matriks Status Komponen
 
 | Area | Status | Catatan |
-|---|---|---|
-| Paket dokumentasi | Dibuat | Dokumen awal dan aturan agent |
-| Audit source code | Belum dilakukan | Perlu audit repo nyata |
-| Genre/game loop | Belum dikonfirmasi | Pemilik produk perlu memutuskan |
-| Mobile client | Belum diverifikasi | Expo config, screens, dependencies |
-| Express backend | Belum diverifikasi | Entrypoint, routes, middleware |
-| Database | Belum diverifikasi | Engine dan schema tidak diketahui |
-| API/realtime | Belum diverifikasi | Endpoint/protocol tidak diketahui |
-| Testing/CI | Belum diverifikasi | Command dan hasil tidak diketahui |
-| Deployment | Belum diverifikasi | Hosting/build process tidak diketahui |
+| --- | --- | --- |
+| Paket Dokumentasi & Aturan Agent | Sinkron & Lengkap | Seluruh dokumen teknis telah disinkronkan dengan keputusan produk |
+| Audit Repository & Bukti | Selesai | Temuan AUD-001 (Monorepo), AUD-002 (.env.example), AUD-003 (Keputusan Game) |
+| Keputusan Produk (AUD-003) | RESOLVED | Top-Down Arena Shooter 2D, Dual Joystick, Multiplayer & Solo Practice, Server-Authoritative |
+| Fondasi Monorepo (npm workspaces) | Diimplementasikan | `apps/mobile`, `apps/server`, `packages/shared` |
+| Express Backend (`apps/server`) | Diimplementasikan | `/api/v1/health`, helmet, cors, centralized error handling |
+| Shared Contract (`packages/shared`) | Diimplementasikan | `HealthStatusResponse` terkompilasi TypeScript |
+| Mobile Client (`apps/mobile`) | Diimplementasikan | React Native Expo dengan layar konektivitas backend riil dan retry handler |
+| Testing Suite | Diimplementasikan | Supertest & Jest untuk backend healthcheck, TypeScript typecheck lintas workspace |
+| Database & Skema Persistence | TBD | Belum diinisialisasi (sesuai scope fase fondasi) |
+| Realtime Socket.IO & Game Loop | TBD | Direncanakan pada fase berikutnya |
 
-## Langkah berikutnya
-1. Jalankan audit existing project.
-2. Perbarui dokumen dengan source evidence dan command results.
-3. Konfirmasi pertanyaan PRD.md dan BUSINESS_RULES.md.
-4. Buat backlog hanya dari temuan dan kebutuhan yang disetujui.
-5. Jalankan tests setelah setiap implementasi.
+---
 
-Status “dibuat” berarti file dokumentasi tersedia, bukan bahwa aplikasi atau gameplay sudah dibuat, dites, atau dirilis.
+## Rincian Milestone Fase Ini
+- [x] Menyelesaikan analisis repositori dan dokumentasi konsisten.
+- [x] Mengonfirmasi keputusan gameplay dan menutup AUD-003.
+- [x] Membangun struktur npm workspaces.
+- [x] Mengimplementasikan `@battleground/shared` dengan tipe kontrak.
+- [x] Mengimplementasikan Express backend dengan endpoint `/api/v1/health`.
+- [x] Mengimplementasikan layar konektivitas React Native Expo dengan retry dan feedback visual.
+- [x] Menjalankan test suite dan typecheck aktual.

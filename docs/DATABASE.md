@@ -1,23 +1,34 @@
 # Database dan Model Data
 
-Status schema aktual: belum diverifikasi. Tidak ada tabel, kolom, relasi atau engine database yang dinyatakan sebagai fakta.
+Status: Terverifikasi Greenfield (Fase Inisialisasi Fondasi Monorepo 2026-10-29).
 
-## Prosedur audit
-1. Cari migration, schema, model/entity, ORM config, query, repository, seeder dan database tests.
-2. Identifikasi cara inisialisasi koneksi dan nama environment variables tanpa menampilkan nilainya.
-3. Dokumentasikan primary/foreign key, constraints, indexes, nullability, defaults, cascade, timestamps dan soft delete jika ada.
-4. Cocokkan model dengan query/route aktif; file model saja tidak membuktikan ia dipakai.
-5. Catat strategi migration, backup, rollback, retensi dan penghapusan data berdasarkan bukti.
-6. Jangan menjalankan reset/drop/truncate atau migration terhadap database bersama/produksi saat audit.
+## 1. Fakta Terverifikasi
 
-## Domain
-Entitas seperti pemain, match, inventory, skor, reward, leaderboard, transaksi atau profil belum ditetapkan. Jangan mengarang tabel hanya karena lazim dalam game. Model diturunkan dari kebutuhan yang disetujui dan alur nyata.
+- **Kondisi Aktual**: Belum ada database engine, ORM, schema migration, seeder, atau model data yang diimplementasikan pada fase ini.
+- **Tabel / Koleksi**: Tidak ada tabel atau relasi aktif di codebase saat ini.
+- **Environment Variables Database**: Belum digunakan pada implementasi fase inisialisasi awal.
 
-## Format per entitas
-Nama dan lokasi definisi; tujuan dan pemilik data; fields/types/nullability/default/constraints; key dan relasi; index dan alasan; migration/rollback; access/retention/deletion; tests.
+## 2. Kebutuhan Data & Domain (Menunggu Tahap Persistensi)
 
-## Integritas dan concurrency
-Jika operasi dapat bersamaan, tentukan transaction, idempotency, conflict handling dan sumber kebenaran. Jangan mengandalkan urutan request client.
+Model data direncanakan untuk tahap berikutnya guna mendukung:
+- **Profil Pemain**: ID akun / Guest UUID, display name, tanggal registrasi.
+- **Riwayat Pertandingan (Match History)**: Match ID, mode (Multiplayer / Solo Practice), skor, jumlah eliminasi, durasi bertahan, timestamp.
+- **Leaderboard**: Peringkat pemain berdasarkan akumulasi skor kemenangan.
 
-## Informasi yang dibutuhkan
-Database/ORM aktual, migration/schema, query aktif, requirements persistence, retention/delete policy, serta consistency model untuk fitur online jika relevan.
+## 3. Rekomendasi Teknologi & Strategi Migrasi
+
+- **ORM / Query Builder**: Disarankan menggunakan Prisma atau Drizzle ORM dengan TypeScript untuk deklarasi skema tipe-aman (*type-safe*).
+- **Database Engine**:
+  - Development / Testing: SQLite (portabel, cepat, tanpa overhead setup lokal).
+  - Production: PostgreSQL (mendukung concurrent connections dan transaksi reliabel).
+- **Integritas & Aturan Keamanan Database**:
+  - Dilarang keras melakukan perintah destruktif (`DROP TABLE`, `TRUNCATE`) tanpa izin eksplisit.
+  - Credential database hanya boleh dibaca dari server environment variables; dilarang keras dimasukkan ke bundle mobile client.
+
+## 4. Status Keputusan
+
+| Domain Entitas | Kebutuhan | Status |
+| --- | --- | --- |
+| Player Account | Profil pemain & Guest UUID | TBD (Tahap Persistensi) |
+| Match / Combat | Riwayat hasil match & skor akhir | TBD (Tahap Persistensi) |
+| Leaderboard | Papan peringkat global | TBD (Tahap Persistensi) |

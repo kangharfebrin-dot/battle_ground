@@ -1,30 +1,96 @@
 # API dan Kontrak Komunikasi
 
-Status endpoint aktual: belum diverifikasi. Tidak ada route HTTP/event realtime yang dicatat sebagai fakta.
+Status: Terverifikasi & Terimplementasi (Baseline Fondasi Monorepo 2026-10-29).
 
-## Audit API
-- Temukan entrypoint Express dan router yang benar-benar diregistrasikan.
-- Catat method/path, middleware, handler, validator, auth, authorization, service dan persistence setiap endpoint.
-- Catat status HTTP, success/error response dan side effect aktual.
-- Cari OpenAPI/Swagger, Postman, versioning, client API mobile dan integration tests.
-- Pastikan route benar-benar dipasang, bukan hanya didefinisikan namun tidak digunakan.
-- Jangan menyertakan credential atau data personal pada contoh request.
+## 1. Fakta Terverifikasi
 
-## Format tiap endpoint
-| Field | Informasi |
-|---|---|
-| ID/tujuan | Perilaku bisnis |
-| Method + path | Persis seperti implementasi |
-| Access control | Berdasarkan middleware/logic |
-| Request | Path/query/body, types, validasi dan batas |
-| Success/error | HTTP status dan payload aktual |
-| Side effects | Perubahan data/event/transaksi |
-| Idempotency/concurrency | Jika relevan |
-| Rate limit | Nilai dan sumber konfigurasi |
-| Evidence | File/baris dan test |
+- **Arsitektur Endpoint**: Express modular router dimuat di bawah prefix `/api/v1`.
+- **Format Envelope**: Seluruh endpoint mengembalikan JSON payload yang konsisten dan terikat dengan type dari `@battleground/shared`.
+- **Keamanan**: Dilindungi oleh middleware `helmet`, `cors`, dan `express.json({ limit: '10kb' })`.
 
-## Realtime
-Jika diperlukan, dokumentasikan transport, auth koneksi, event schema/version, ukuran pesan, validation, ordering, ack, timeout/retry, reconnect, resync, rate limiting dan observability.
+---
 
-## Standar ke depan
-Validasi input server-side, gunakan error contract konsisten, jangan membocorkan stack trace atau data yang tidak berhak dilihat, dan jangan membuat breaking change tanpa persetujuan serta strategi migrasi. Pilih OpenAPI/Postman setelah memeriksa tooling aktual.
+## 2. Kontrak Endpoint Riil
+
+### `GET /api/v1/health`
+
+Memeriksa kesehatan dan ketersediaan layanan Express backend.
+
+- **URL**: `/api/v1/health`
+- **Method**: `GET`
+- **Autentikasi**: Tidak ada (Endpoint Publik)
+- **Content-Type**: `application/json`
+
+#### Response Sukses (`200 OK`)
+
+```json
+{
+  "status": "ok",
+  "service": "battleground-server",
+  "timestamp": "2026-10-29T08:30:00.000Z",
+  "uptime": 124,
+  "environment": "development",
+  "version": "0.1.0"
+}
+```
+
+#### TypeScript Definition (`@battleground/shared`)
+
+```typescript
+export interface HealthStatusResponse {
+  status: 'ok' | 'degraded' | 'down';
+  service: string;
+  timestamp: string;
+  uptime: number;
+  environment: string;
+  version: string;
+}
+```
+
+---
+
+### Penanganan Error Rute Tidak Ditemukan (`404 Not Found`)
+
+Jika klien memanggil endpoint yang tidak terdaftar (misalnya `/api/v1/non-existent`):
+
+```json
+{
+  "error": {
+    "message": "Route Not Found"
+  }
+}
+```
+
+---
+
+### Penanganan Server Internal Error (`500 Internal Server Error`)
+
+Jika terjadi unhandled exception pada controller:
+
+- **Mode Development (`NODE_ENV=development`)**:
+  ```json
+  {
+    "error": {
+      "message": "Detail pesan error spesifik"
+    }
+  }
+  ```
+- **Mode Production (`NODE_ENV=production`)**:
+  ```json
+  {
+    "error": {
+      "message": "Internal Server Error"
+    }
+  }
+  ```
+  *(Stack trace tidak pernah diekspos ke klien; dicatat aman ke log server)*.
+
+---
+
+## 3. Rencana Endpoint Tahap Selanjutnya (TBD)
+
+| Method | Path | Tujuan | Status |
+| --- | --- | --- | --- |
+| POST | `/api/v1/matches/create` | Inisialisasi room arena baru | TBD (Tahap Realtime Match) |
+| POST | `/api/v1/matches/join` | Pemain bergabung ke arena | TBD (Tahap Realtime Match) |
+| GET | `/api/v1/leaderboard` | Papan peringkat pemain | TBD (Tahap Persistence) |
