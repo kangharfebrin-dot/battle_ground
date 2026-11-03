@@ -1,0 +1,57 @@
+[gd_scene load_steps=8 format=3 uid="uid://ba4m7v1q9k3r5"]
+
+[ext_resource type="Material" uid="uid://e4n8m2p7q1v5x" path="res://assets/environment/materials/mat_rock.tres" id="1_trunk_mat"]
+[ext_resource type="Material" uid="uid://c6xk1m8v3q5p2" path="res://assets/environment/materials/mat_pine_foliage.tres" id="2_foliage_mat"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_trunk"]
+material = ExtResource("1_trunk_mat")
+top_radius = 0.2
+bottom_radius = 0.3
+height = 4.0
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_trunk"]
+height = 4.0
+radius = 0.3
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_tier1"]
+material = ExtResource("2_foliage_mat")
+top_radius = 0.3
+bottom_radius = 2.2
+height = 2.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_tier2"]
+material = ExtResource("2_foliage_mat")
+top_radius = 0.1
+bottom_radius = 1.6
+height = 2.2
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_tier3"]
+material = ExtResource("2_foliage_mat")
+top_radius = 0.0
+bottom_radius = 1.0
+height = 1.8
+
+[node name="PineTree" type="StaticBody3D"]
+collision_layer = 2
+collision_mask = 7
+
+[node name="TrunkMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+mesh = SubResource("CylinderMesh_trunk")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+shape = SubResource("CylinderShape3D_trunk")
+
+[node name="FoliageTier1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+mesh = SubResource("CylinderMesh_tier1")
+
+[node name="FoliageTier2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, 0)
+mesh = SubResource("CylinderMesh_tier2")
+
+[node name="FoliageTier3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.2, 0)
+mesh = SubResource("CylinderMesh_tier3")
+

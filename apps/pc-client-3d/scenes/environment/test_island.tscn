@@ -1,0 +1,158 @@
+[gd_scene load_steps=18 format=3 uid="uid://c7m9k2v4r8p1x"]
+
+[ext_resource type="Material" uid="uid://c8m3v9x1q5k4r" path="res://assets/environment/materials/mat_ground_grass.tres" id="1_ground_mat"]
+[ext_resource type="Material" uid="uid://df7x3m1q9k5v2" path="res://assets/environment/materials/mat_concrete_barrier.tres" id="2_road_mat"]
+[ext_resource type="Material" uid="uid://ba9m3v1q5k7r2" path="res://assets/environment/materials/mat_water.tres" id="3_water_mat"]
+[ext_resource type="PackedScene" uid="uid://dm3k8v1q5n7r2" path="res://scenes/environment/prop_military_container.tscn" id="4_container"]
+[ext_resource type="PackedScene" uid="uid://df8m3v2p5k1q4" path="res://scenes/environment/prop_concrete_barrier.tscn" id="5_barrier"]
+[ext_resource type="PackedScene" uid="uid://ba4m7v1q9k3r5" path="res://scenes/environment/prop_pine_tree.tscn" id="6_tree"]
+[ext_resource type="PackedScene" uid="uid://c5m2v7p1q4k8r" path="res://scenes/environment/prop_boulder.tscn" id="7_boulder"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_island"]
+sky_top_color = Color(0.24, 0.44, 0.72, 1)
+sky_horizon_color = Color(0.68, 0.76, 0.84, 1)
+ground_bottom_color = Color(0.18, 0.22, 0.16, 1)
+ground_horizon_color = Color(0.55, 0.65, 0.58, 1)
+
+[sub_resource type="Sky" id="Sky_island"]
+sky_material = SubResource("ProceduralSkyMaterial_island")
+
+[sub_resource type="Environment" id="Environment_island"]
+background_mode = 2
+sky = SubResource("Sky_island")
+ambient_light_source = 3
+ambient_light_energy = 0.85
+tonemap_mode = 2
+fog_enabled = true
+fog_light_color = Color(0.66, 0.74, 0.8, 1)
+fog_density = 0.003
+fog_depth_begin = 20.0
+fog_depth_end = 200.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+material = ExtResource("1_ground_mat")
+size = Vector2(250, 250)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(250, 1, 250)
+
+[sub_resource type="BoxMesh" id="BoxMesh_road"]
+material = ExtResource("2_road_mat")
+size = Vector3(8, 0.1, 140)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hill1"]
+material = ExtResource("1_ground_mat")
+size = Vector3(45, 8, 55)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hill1"]
+size = Vector3(45, 8, 55)
+
+[sub_resource type="BoxMesh" id="BoxMesh_water"]
+material = ExtResource("3_water_mat")
+size = Vector3(36, 0.2, 24)
+
+[node name="TestIsland" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_island")
+
+[node name="SunLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.766, -0.423, 0.485, 0, 0.754, 0.657, -0.643, -0.503, 0.578, 0, 40, 0)
+light_color = Color(1, 0.96, 0.88, 1)
+light_energy = 1.3
+shadow_enabled = true
+shadow_bias = 0.03
+shadow_blur = 1.2
+
+[node name="Terrain" type="StaticBody3D" parent="."]
+collision_layer = 2
+collision_mask = 7
+
+[node name="GroundMesh" type="MeshInstance3D" parent="Terrain"]
+mesh = SubResource("PlaneMesh_ground")
+
+[node name="GroundCollision" type="CollisionShape3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_ground")
+
+[node name="RoadMesh" type="MeshInstance3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+mesh = SubResource("BoxMesh_road")
+
+[node name="NorthHill" type="StaticBody3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -65)
+collision_layer = 2
+collision_mask = 7
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/NorthHill"]
+mesh = SubResource("BoxMesh_hill1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/NorthHill"]
+shape = SubResource("BoxShape3D_hill1")
+
+[node name="EastHill" type="StaticBody3D" parent="Terrain"]
+transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866, 60, 4, 15)
+collision_layer = 2
+collision_mask = 7
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/EastHill"]
+mesh = SubResource("BoxMesh_hill1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/EastHill"]
+shape = SubResource("BoxShape3D_hill1")
+
+[node name="WaterPond" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 0.1, 30)
+mesh = SubResource("BoxMesh_water")
+
+[node name="MilitaryCompound" type="Node3D" parent="."]
+
+[node name="Container1" parent="MilitaryCompound" instance=ExtResource("4_container")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -10)
+
+[node name="Container2" parent="MilitaryCompound" instance=ExtResource("4_container")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -17)
+
+[node name="Container3" parent="MilitaryCompound" instance=ExtResource("4_container")]
+transform = Transform3D(0.707, 0, 0.707, 0, 1, 0, -0.707, 0, 0.707, 12, 0, -8)
+
+[node name="ContainerStack" parent="MilitaryCompound" instance=ExtResource("4_container")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2.6, -13.5)
+
+[node name="Barrier1" parent="MilitaryCompound" instance=ExtResource("5_barrier")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+
+[node name="Barrier2" parent="MilitaryCompound" instance=ExtResource("5_barrier")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 4, 0, -12)
+
+[node name="Barrier3" parent="MilitaryCompound" instance=ExtResource("5_barrier")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -6)
+
+[node name="Vegetation" type="Node3D" parent="."]
+
+[node name="Tree1" parent="Vegetation" instance=ExtResource("6_tree")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0, 15)
+
+[node name="Tree2" parent="Vegetation" instance=ExtResource("6_tree")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, -18, 0, 28)
+
+[node name="Tree3" parent="Vegetation" instance=ExtResource("6_tree")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 25, 0, 30)
+
+[node name="Tree4" parent="Vegetation" instance=ExtResource("6_tree")]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 35, 0, -25)
+
+[node name="Tree5" parent="Vegetation" instance=ExtResource("6_tree")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0, -40)
+
+[node name="Rocks" type="Node3D" parent="."]
+
+[node name="Boulder1" parent="Rocks" instance=ExtResource("7_boulder")]
+transform = Transform3D(1.5, 0, 0, 0, 1.2, 0, 0, 0, 1.4, -28, 0, -8)
+
+[node name="Boulder2" parent="Rocks" instance=ExtResource("7_boulder")]
+transform = Transform3D(1.8, 0, 0, 0, 1.5, 0, 0, 0, 1.6, 22, 0, -32)
+
+[node name="Boulder3" parent="Rocks" instance=ExtResource("7_boulder")]
+transform = Transform3D(1.2, 0, 0, 0, 1, 0, 0, 0, 1.2, 8, 0, 24)
+
