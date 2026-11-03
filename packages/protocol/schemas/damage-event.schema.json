@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DamageEvent",
+  "description": "Event broadcast when an entity takes damage",
+  "type": "object",
+  "required": ["shooterId", "targetId", "damageAmount"],
+  "properties": {
+    "shooterId": {
+      "type": "string"
+    },
+    "targetId": {
+      "type": "string"
+    },
+    "damageAmount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "weaponId": {
+      "type": "string"
+    },
+    "isFatal": {
+      "type": "boolean"
+    },
+    "timestamp": {
+      "type": "number"
+    }
+  },
+  "additionalProperties": false
+}
+

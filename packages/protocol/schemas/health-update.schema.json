@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HealthUpdate",
+  "description": "Synchronization of entity health state",
+  "type": "object",
+  "required": ["playerId", "newHealth", "maxHealth"],
+  "properties": {
+    "playerId": {
+      "type": "string"
+    },
+    "newHealth": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "maxHealth": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "isAlive": {
+      "type": "boolean"
+    },
+    "timestamp": {
+      "type": "number"
+    }
+  },
+  "additionalProperties": false
+}
+

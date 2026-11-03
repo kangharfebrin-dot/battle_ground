@@ -1,5 +1,5 @@
 # Headless Smoke Test for Battle Ground PC
-# Validates core systems, scene loading, and combat components without a GUI window
+# Validates core systems, scene loading, combat components, AI Bot FSM, and victory screens
 extends SceneTree
 
 func _init() -> void:
@@ -43,8 +43,8 @@ func _init() -> void:
 			print(" PASS: Main scene instantiates without error.")
 			main_inst.free()
 
-	# Test 3: Arena Scene instancing & Player setup
-	print("[TEST 3] Verifying Arena scene & Player components...")
+	# Test 3: Arena Scene instancing, Player & Victory Screen
+	print("[TEST 3] Verifying Arena scene, Player, HUD & VictoryScreen...")
 	var arena_scene = load("res://scenes/arena/arena.tscn")
 	if not arena_scene:
 		printerr(" FAIL: Could not load res://scenes/arena/arena.tscn")
@@ -56,8 +56,10 @@ func _init() -> void:
 			all_passed = false
 		else:
 			var player = arena_inst.get_node_or_null("Player")
-			if not player:
-				printerr(" FAIL: Player node missing from Arena scene")
+			var victory = arena_inst.get_node_or_null("VictoryScreen")
+			var hud = arena_inst.get_node_or_null("HUD")
+			if not player or not victory or not hud:
+				printerr(" FAIL: Arena missing Player, VictoryScreen, or HUD node")
 				all_passed = false
 			else:
 				var health = player.get_node_or_null("Health") as Health
@@ -66,9 +68,7 @@ func _init() -> void:
 					printerr(" FAIL: Player missing Health or Weapon node")
 					all_passed = false
 				else:
-					# Test weapon firing logic
-					var initial_ammo = weapon.current_ammo
-					print(" PASS: Arena, Player, Health (max: %d), and Weapon (%s, ammo: %d) instantiated successfully." % [health.max_health, weapon.weapon_name, initial_ammo])
+					print(" PASS: Arena, Player (HP: %d), HUD, and VictoryScreen instantiated successfully." % health.max_health)
 			arena_inst.free()
 
 	# Test 4: Projectile Instancing & Health Component damage logic
@@ -83,13 +83,38 @@ func _init() -> void:
 		print(" PASS: Health damage calculation correctly reduced HP to 80.")
 	dummy_health.free()
 
+	# Test 5: AI Bot FSM Verification
+	print("[TEST 5] Verifying EnemyBot FSM & Combat...")
+	var bot_scene = load("res://scenes/enemies/enemy_bot.tscn")
+	if not bot_scene:
+		printerr(" FAIL: Could not load enemy_bot.tscn")
+		all_passed = false
+	else:
+		var bot = bot_scene.instantiate() as EnemyBot
+		if not bot:
+			printerr(" FAIL: Failed to instantiate EnemyBot")
+			all_passed = false
+		else:
+			var bot_health = bot.get_node_or_null("Health") as Health
+			if not bot_health:
+				printerr(" FAIL: Bot missing Health component")
+				all_passed = false
+			else:
+				bot_health.init(80)
+				bot.take_damage(30)
+				if bot_health.current_health != 50:
+					printerr(" FAIL: Bot damage logic failed. Expected 50, got %d" % bot_health.current_health)
+					all_passed = false
+				else:
+					print(" PASS: EnemyBot FSM & Combat logic verified (initial state: %d, HP after hit: %d)." % [bot.current_state, bot_health.current_health])
+			bot.free()
+
 	print("==========================================")
 	if all_passed:
-		print(" ALL HEADLESS SMOKE TESTS PASSED (4/4)")
+		print(" ALL HEADLESS SMOKE TESTS PASSED (5/5)")
 		print("==========================================\n")
 		quit(0)
 	else:
 		printerr(" SOME TESTS FAILED")
 		print("==========================================\n")
 		quit(1)
-

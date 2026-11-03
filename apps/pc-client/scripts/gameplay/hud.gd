@@ -1,5 +1,5 @@
 # HUD Controller
-# Displays vital in-game telemetry: HP, Ammo, Weapon, Match Timer, Score, and Controls Hint
+# Displays vital in-game telemetry: HP, Ammo, Weapon, Match Timer, Score, Kill Feed, Crosshair, and Controls
 class_name HUD
 extends CanvasLayer
 
@@ -10,6 +10,18 @@ extends CanvasLayer
 @onready var timer_label: Label = $RootMargin/TopCenter/TimerLabel
 @onready var score_label: Label = $RootMargin/TopCenter/ScoreLabel
 @onready var reload_indicator: Label = $RootMargin/VBoxBottomRight/ReloadIndicator
+@onready var kill_feed_container: VBoxContainer = $RootMargin/KillFeedContainer
+@onready var crosshair: Control = $Crosshair
+
+func _ready() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
+
+func _exit_tree() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func _process(_delta: float) -> void:
+	if crosshair:
+		crosshair.global_position = crosshair.get_global_mouse_position()
 
 func setup(player: Player) -> void:
 	if player:
@@ -59,3 +71,19 @@ func update_timer(seconds_remaining: float) -> void:
 		var secs = int(seconds_remaining) % 60
 		timer_label.text = "%02d:%02d" % [mins, secs]
 
+func add_kill_feed(killer_name: String, victim_name: String) -> void:
+	if not kill_feed_container:
+		return
+
+	var entry = Label.new()
+	entry.text = "%s  [ELIMINATED]  %s" % [killer_name, victim_name]
+	entry.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4, 0.95))
+	entry.add_theme_font_size_override("font_size", 13)
+	kill_feed_container.add_child(entry)
+
+	# Auto remove after 3.5 seconds
+	var timer = get_tree().create_timer(3.5)
+	timer.timeout.connect(func():
+		if is_instance_valid(entry):
+			entry.queue_free()
+	)

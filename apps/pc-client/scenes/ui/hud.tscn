@@ -1,9 +1,18 @@
-[gd_scene load_steps=2 format=3 uid="uid://df7x8k2m9q5r3"]
+[gd_scene load_steps=3 format=3 uid="uid://df7x8k2m9q5r3"]
 
 [ext_resource type="Script" path="res://scripts/gameplay/hud.gd" id="1_hud"]
+[ext_resource type="Script" path="res://scripts/gameplay/crosshair.gd" id="2_crosshair"]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_hud")
+
+[node name="Crosshair" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+script = ExtResource("2_crosshair")
 
 [node name="RootMargin" type="MarginContainer" parent="."]
 anchors_preset = 15
@@ -11,6 +20,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
@@ -46,6 +56,12 @@ layout_mode = 2
 text = "SCORE: 0"
 horizontal_alignment = 1
 
+[node name="KillFeedContainer" type="VBoxContainer" parent="RootMargin"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+theme_override_constants/separation = 4
+
 [node name="VBoxBottomRight" type="VBoxContainer" parent="RootMargin"]
 layout_mode = 2
 size_flags_horizontal = 8
@@ -73,4 +89,3 @@ size_flags_horizontal = 0
 size_flags_vertical = 8
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 0.7)
 text = "WASD: Move | Shift: Sprint | Space: Dash | LMB: Fire | R: Reload | 1-3: Weapon | ESC: Pause"
-

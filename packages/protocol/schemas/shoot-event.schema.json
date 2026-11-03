@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ShootEvent",
+  "description": "Event broadcast when a player discharges a weapon",
+  "type": "object",
+  "required": ["playerId", "weaponId", "origin", "direction"],
+  "properties": {
+    "playerId": {
+      "type": "string"
+    },
+    "weaponId": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "number"
+    },
+    "origin": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "direction": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "isAutomatic": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}
+

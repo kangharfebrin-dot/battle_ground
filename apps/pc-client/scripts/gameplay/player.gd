@@ -1,5 +1,5 @@
 # Player Controller
-# 2D Top-Down shooter player with WASD movement, 360-degree mouse aiming, dash, and weapons
+# 2D Top-Down tactical operative with WASD movement, 360-degree mouse aiming, dash, dynamic camera shake
 class_name Player
 extends CharacterBody2D
 
@@ -26,10 +26,26 @@ var dash_direction: Vector2 = Vector2.ZERO
 var available_weapons: Array[String] = ["pistol", "shotgun", "rifle"]
 var current_weapon_index: int = 0
 
+# Screen Shake (Trauma model)
+var trauma: float = 0.0
+var trauma_decay: float = 1.8
+var max_shake_offset: float = 12.0
+var max_shake_roll: float = 0.05
+
+var is_flashing: bool = false
+var flash_timer: float = 0.0
+
 func _ready() -> void:
+	add_to_group("player")
 	_load_character_stats()
+
 	if health:
 		health.died.connect(_on_died)
+		health.damaged.connect(_on_damaged)
+
+	if weapon:
+		weapon.fired.connect(_on_weapon_fired)
+
 	queue_redraw()
 
 func _load_character_stats() -> void:
@@ -61,6 +77,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		_switch_weapon(1)
 	elif event.is_action_pressed("weapon_3"):
 		_switch_weapon(2)
+
+func _process(delta: float) -> void:
+	_process_screen_shake(delta)
+	_update_damage_flash(delta)
 
 func _physics_process(delta: float) -> void:
 	if not health or not health.is_alive():
@@ -107,6 +127,8 @@ func _start_dash() -> void:
 	dash_direction = input_vector.normalized()
 	is_dashing = true
 	dash_timer = dash_duration
+	add_trauma(0.1)
+
 	var audio_mgr = get_node_or_null("/root/AudioManager")
 	if audio_mgr and audio_mgr.has_method("play_sfx"):
 		audio_mgr.play_sfx("dash", 1.2)
@@ -127,20 +149,61 @@ func _switch_weapon(index: int) -> void:
 		weapon.load_weapon_stats(w_id)
 		weapon_switched.emit(w_id)
 
+func take_damage(amount: int, source: Node = null) -> void:
+	if health and health.is_alive():
+		health.take_damage(amount, source)
+
+func _on_damaged(_amount: int, _source: Node) -> void:
+	add_trauma(0.4)
+	is_flashing = true
+	flash_timer = 0.12
+	queue_redraw()
+
+func _on_weapon_fired() -> void:
+	add_trauma(0.12)
+
+func add_trauma(amount: float) -> void:
+	trauma = clampf(trauma + amount, 0.0, 1.0)
+
+func _process_screen_shake(delta: float) -> void:
+	if not camera:
+		return
+
+	if trauma > 0.0:
+		trauma = maxf(0.0, trauma - trauma_decay * delta)
+		var shake = trauma * trauma
+		camera.offset = Vector2(
+			randf_range(-max_shake_offset, max_shake_offset) * shake,
+			randf_range(-max_shake_offset, max_shake_offset) * shake
+		)
+		camera.rotation = randf_range(-max_shake_roll, max_shake_roll) * shake
+	else:
+		camera.offset = Vector2.ZERO
+		camera.rotation = 0.0
+
+func _update_damage_flash(delta: float) -> void:
+	if is_flashing:
+		flash_timer -= delta
+		if flash_timer <= 0.0:
+			is_flashing = false
+			queue_redraw()
+
 func _on_died() -> void:
 	velocity = Vector2.ZERO
+	add_trauma(0.8)
 	died.emit()
 	queue_redraw()
 
 func _draw() -> void:
 	if health and not health.is_alive():
-		# Wreckage / Defeated circle
 		draw_circle(Vector2.ZERO, body_radius, Color(0.3, 0.3, 0.3, 0.6))
 		return
 
+	var body_color = Color(1.0, 0.4, 0.4) if is_flashing else Color(0.2, 0.45, 0.85)
+
 	# Operative Body
-	draw_circle(Vector2.ZERO, body_radius, Color(0.2, 0.45, 0.85))
-	draw_circle(Vector2.ZERO, body_radius - 3.0, Color(0.12, 0.28, 0.58))
+	draw_circle(Vector2.ZERO, body_radius, body_color)
+	draw_circle(Vector2.ZERO, body_radius - 3.0, body_color.darkened(0.25))
 
 	# Visor / Helmet accent
 	draw_circle(Vector2(6, 0), 4.0, Color(0.3, 0.8, 1.0))

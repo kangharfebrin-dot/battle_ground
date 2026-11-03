@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AuthLogin",
+  "description": "Authentication credentials and token contracts",
+  "type": "object",
+  "required": ["username"],
+  "properties": {
+    "username": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 24
+    },
+    "password": {
+      "type": "string",
+      "minLength": 6
+    },
+    "token": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
+

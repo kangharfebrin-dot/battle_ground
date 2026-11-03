@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PlayerMove",
+  "description": "Realtime player movement and orientation packet",
+  "type": "object",
+  "required": ["playerId", "position", "rotation"],
+  "properties": {
+    "playerId": {
+      "type": "string"
+    },
+    "sequenceNumber": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "timestamp": {
+      "type": "number"
+    },
+    "position": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "velocity": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "rotation": {
+      "type": "number",
+      "description": "Aim angle in radians (-PI to PI)"
+    }
+  },
+  "additionalProperties": false
+}
+

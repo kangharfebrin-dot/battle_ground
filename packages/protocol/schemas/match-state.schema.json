@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MatchState",
+  "description": "Lifecycle state of a match session",
+  "type": "object",
+  "required": ["matchId", "state", "timeRemaining"],
+  "properties": {
+    "matchId": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string",
+      "enum": ["WAITING", "START", "IN_PROGRESS", "END"]
+    },
+    "timeRemaining": {
+      "type": "number",
+      "minimum": 0
+    },
+    "winnerId": {
+      "type": ["string", "null"]
+    },
+    "scores": {
+      "type": "object",
+      "additionalProperties": { "type": "integer" }
+    },
+    "timestamp": {
+      "type": "number"
+    }
+  },
+  "additionalProperties": false
+}
+
