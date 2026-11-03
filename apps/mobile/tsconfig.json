@@ -5,6 +5,7 @@
     "lib": ["DOM", "ESNext"],
     "moduleResolution": "node",
     "skipLibCheck": true,
+    "types": [],
     "composite": false
   },
   "include": [
@@ -13,4 +14,3 @@
     "index.ts"
   ]
 }
-

@@ -7,14 +7,18 @@ const monorepoRoot = path.resolve(projectRoot, '../..');
 
 const config = getDefaultConfig(projectRoot);
 
-// 1. Watch all files within the monorepo
-config.watchFolders = [monorepoRoot];
+// Pastikan semua default watchFolders dipertahankan, lalu tambahkan root monorepo
+config.watchFolders = Array.from(
+  new Set([...(config.watchFolders || [projectRoot]), monorepoRoot])
+);
 
-// 2. Let Metro know where to resolve packages and in what order
-config.resolver.nodeModulesPaths = [
-  path.resolve(projectRoot, 'node_modules'),
-  path.resolve(monorepoRoot, 'node_modules'),
-];
+// Pastikan module resolution mencakup direktori lokal dan root monorepo
+config.resolver.nodeModulesPaths = Array.from(
+  new Set([
+    ...(config.resolver.nodeModulesPaths || []),
+    path.resolve(projectRoot, 'node_modules'),
+    path.resolve(monorepoRoot, 'node_modules')
+  ])
+);
 
 module.exports = config;
-

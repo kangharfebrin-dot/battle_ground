@@ -1,6 +1,6 @@
 # API dan Kontrak Komunikasi
 
-Status: Terverifikasi & Terimplementasi (Baseline Fondasi Monorepo 2026-10-29).
+Status: Terverifikasi & Terimplementasi (Diperbarui 2026-10-29).
 
 ## 1. Fakta Terverifikasi
 
@@ -34,8 +34,11 @@ Memeriksa kesehatan dan ketersediaan layanan Express backend.
 }
 ```
 
-#### TypeScript Definition (`@battleground/shared`)
+---
 
+## 3. Kontrak Tipe Data Bersama (`@battleground/shared`)
+
+### Kontrak Status & Respon
 ```typescript
 export interface HealthStatusResponse {
   status: 'ok' | 'degraded' | 'down';
@@ -45,49 +48,63 @@ export interface HealthStatusResponse {
   environment: string;
   version: string;
 }
-```
 
----
-
-### Penanganan Error Rute Tidak Ditemukan (`404 Not Found`)
-
-Jika klien memanggil endpoint yang tidak terdaftar (misalnya `/api/v1/non-existent`):
-
-```json
-{
-  "error": {
-    "message": "Route Not Found"
-  }
+export interface ApiErrorResponse {
+  error: {
+    message: string;
+    code?: string;
+  };
 }
 ```
 
+### Kontrak Entitas & Fisika Gameplay
+```typescript
+export interface Vector2D {
+  x: number;
+  y: number;
+}
+
+export interface ArenaDimensions {
+  width: number;
+  height: number;
+}
+
+export interface EntityState {
+  id: string;
+  x: number;
+  y: number;
+  radius: number;
+  hp: number;
+  maxHp: number;
+}
+
+export interface PlayerState extends EntityState {
+  angle: number; // Sudut hadap/aim dalam radian
+  speed: number;
+}
+
+export interface ProjectileState {
+  id: string;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  damage: number;
+  distanceTraveled: number;
+  maxDistance: number;
+}
+```
+
+### Utilitas Matematika Fisika Teruji
+- `calculateDistance(p1: Vector2D, p2: Vector2D): number`
+- `checkCircleCollision(c1, c2): boolean`
+- `clampToArena(pos: Vector2D, radius: number, bounds: ArenaDimensions): Vector2D`
+- `normalizeVector(v: Vector2D): Vector2D`
+
 ---
 
-### Penanganan Server Internal Error (`500 Internal Server Error`)
-
-Jika terjadi unhandled exception pada controller:
-
-- **Mode Development (`NODE_ENV=development`)**:
-  ```json
-  {
-    "error": {
-      "message": "Detail pesan error spesifik"
-    }
-  }
-  ```
-- **Mode Production (`NODE_ENV=production`)**:
-  ```json
-  {
-    "error": {
-      "message": "Internal Server Error"
-    }
-  }
-  ```
-  *(Stack trace tidak pernah diekspos ke klien; dicatat aman ke log server)*.
-
----
-
-## 3. Rencana Endpoint Tahap Selanjutnya (TBD)
+## 4. Rencana Endpoint Tahap Selanjutnya (TBD)
 
 | Method | Path | Tujuan | Status |
 | --- | --- | --- | --- |

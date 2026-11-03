@@ -3,10 +3,11 @@
     "name": "Battle Ground",
     "slug": "battle-ground",
     "version": "0.1.0",
-    "orientation": "portrait",
+    "orientation": "landscape",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "splash": {
+      "image": "./assets/splash.png",
       "backgroundColor": "#0F172A"
     },
     "assetBundlePatterns": [
@@ -17,6 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0F172A"
       }
     },
@@ -25,4 +27,3 @@
     }
   }
 }
-

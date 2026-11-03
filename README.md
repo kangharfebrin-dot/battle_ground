@@ -8,16 +8,18 @@ Top-Down Arena Shooter 2D mobile game yang dibangun dengan React Native Expo dan
 
 Repository ini menggunakan arsitektur **npm workspaces** dengan pembagian paket:
 
-- **`apps/mobile`**: Aplikasi klien React Native menggunakan Expo SDK dan TypeScript.
+- **`apps/mobile`**: Aplikasi klien React Native menggunakan Expo SDK dan TypeScript, memuat:
+  - Layar **Solo Practice Arena (2D Shooter)**: Arena 2D dengan batas dinding fisik, karakter prajurit, dual virtual joystick (gerak dan tembak), proyektil, target dummy dengan HP, dan sistem reset latihan.
+  - Layar **Status Koneksi Server**: Monitor healthcheck backend dengan penanganan loading, error, timeout, dan retry.
 - **`apps/server`**: Backend REST API & Server-Authoritative Engine menggunakan Express dan TypeScript.
-- **`packages/shared`**: Kontrak data (DTO), enum, dan antarmuka TypeScript bersama antara mobile dan server.
+- **`packages/shared`**: Kontrak data (DTO), enum, modul kalkulasi fisika (collision detection, distance, clamp arena, vector normalization) bersama antara mobile dan server.
 - **`docs/`**: Dokumentasi lengkap arsitektur, API, aturan bisnis gameplay, keamanan, dan rencana implementasi.
 
 ---
 
 ## 2. Prasyarat Sistem
 
-- **Node.js**: `v20.x` - `v24.x` (Direkomendasikan Node.js LTS atau versi aktif, terverifikasi pada Node.js `v24.20.0`).
+- **Node.js**: `v20.x` - `v24.x` (Terverifikasi pada Node.js `v24.20.0`).
 - **npm**: `v10.x` atau `v11.x` (Terverifikasi pada npm `11.19.0`).
 - **Expo Go** pada perangkat fisik atau simulator Android / iOS.
 
@@ -25,23 +27,17 @@ Repository ini menggunakan arsitektur **npm workspaces** dengan pembagian paket:
 
 ## 3. Instalasi dan Setup Awal
 
-1. Clone repository dan masuk ke direktori:
-   ```bash
-   git clone https://github.com/kangharfebrin-dot/battle_ground.git
-   cd battle_ground
-   ```
-
-2. Salin template environment variable:
+1. Salin template environment variable:
    ```bash
    cp .env.example .env
    ```
 
-3. Pasang seluruh dependensi monorepo:
+2. Pasang seluruh dependensi monorepo:
    ```bash
    npm install
    ```
 
-4. Bangun paket kontrak bersama:
+3. Bangun paket kontrak bersama:
    ```bash
    npm run build:shared
    ```
@@ -54,7 +50,7 @@ Repository ini menggunakan arsitektur **npm workspaces** dengan pembagian paket:
 ```bash
 npm run dev:server
 ```
-Server akan berjalan di `http://localhost:4000`. Anda dapat memverifikasi kesehatan server melalui peramban atau terminal:
+Server akan berjalan di `http://localhost:4000`. Endpoint health check:
 ```bash
 curl http://localhost:4000/api/v1/health
 ```
@@ -63,7 +59,10 @@ curl http://localhost:4000/api/v1/health
 ```bash
 npm run dev:mobile
 ```
-Setelah Expo CLI terbuka, tekan `a` untuk Android Emulator, `i` untuk iOS Simulator, atau pindai QR code menggunakan aplikasi **Expo Go** pada perangkat fisik.
+Setelah Expo CLI terbuka:
+- Tekan **`a`** untuk membuka pada **Android Emulator**.
+- Tekan **`i`** untuk membuka pada **iOS Simulator**.
+- Pindai QR Code di layar menggunakan aplikasi **Expo Go** pada perangkat fisik Android/iOS.
 
 > **Catatan Konfigurasi Alamat API (`EXPO_PUBLIC_API_URL`)**:
 > - **iOS Simulator**: `http://localhost:4000`
@@ -77,14 +76,17 @@ Setelah Expo CLI terbuka, tekan `a` untuk Android Emulator, `i` untuk iOS Simula
 Jalankan perintah pengujian dan pengecekan tipe:
 
 ```bash
-# Typecheck seluruh workspace
+# Typecheck seluruh workspace (Shared, Server, Mobile)
 npm run typecheck
 
-# Jalankan integration test backend (Jest + Supertest)
-npm run test:server
+# Jalankan linter ESLint
+npm run lint
 
-# Build backend untuk produksi
-npm run build:server
+# Jalankan seluruh unit & integration test (Jest)
+npm test
+
+# Verifikasi integritas dependensi Expo
+cd apps/mobile && npx expo-doctor
 ```
 
 ---
@@ -92,9 +94,8 @@ npm run build:server
 ## 6. Dokumentasi Lanjutan
 
 - [PRD.md](file:///e:/Project/Game/battleground/PRD.md): Rincian produk, gameplay loop, dan kontrol dual virtual joystick.
-- [docs/ARCHITECTURE.md](file:///e:/Project/Game/battleground/docs/ARCHITECTURE.md): Diagram dan batas tanggung jawab komponen sistem.
+- [docs/ARCHITECTURE.md](file:///e:/Project/Game/battleground/docs/ARCHITECTURE.md): Diagram modul dan arsitektur sistem.
 - [docs/API.md](file:///e:/Project/Game/battleground/docs/API.md): Spesifikasi kontrak endpoint REST API.
-- [docs/BUSINESS_RULES.md](file:///e:/Project/Game/battleground/docs/BUSINESS_RULES.md): Mekanika arena, aturan menang/kalah, dan otoritas server.
-- [docs/SECURITY.md](file:///e:/Project/Game/battleground/docs/SECURITY.md): Penegakan zero client secrets dan pengerasan server.
-- [docs/TESTING.md](file:///e:/Project/Game/battleground/docs/TESTING.md): Laporan dan strategi pengujian.
-- [docs/PROGRESS.md](file:///e:/Project/Game/battleground/docs/PROGRESS.md): Status pencapaian milestone.
+- [docs/BUSINESS_RULES.md](file:///e:/Project/Game/battleground/docs/BUSINESS_RULES.md): Mekanika arena, aturan menang/kalah, dan kalkulasi hit.
+- [docs/TESTING.md](file:///e:/Project/Game/battleground/docs/TESTING.md): Log eksekusi dan hasil pengujian riil.
+- [docs/IMPLEMENTATION_PLAN.md](file:///e:/Project/Game/battleground/docs/IMPLEMENTATION_PLAN.md): Peta jalan tahapan pengerjaan.
