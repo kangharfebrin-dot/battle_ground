@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GameStateSnapshot",
+  "type": "object",
+  "required": ["tick", "server_timestamp", "players", "projectiles"],
+  "properties": {
+    "tick": { "type": "integer", "minimum": 0 },
+    "server_timestamp": { "type": "number" },
+    "match_state": {
+      "type": "string",
+      "enum": ["LOBBY", "COUNTDOWN", "IN_PROGRESS", "MATCH_ENDED"]
+    },
+    "match_time_remaining": { "type": "number" },
+    "players": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "x", "y", "angle", "hp", "max_hp", "is_alive"],
+        "properties": {
+          "id": { "type": "string" },
+          "x": { "type": "number" },
+          "y": { "type": "number" },
+          "angle": { "type": "number" },
+          "hp": { "type": "number" },
+          "max_hp": { "type": "number" },
+          "is_alive": { "type": "boolean" },
+          "score": { "type": "integer" },
+          "current_weapon": { "type": "string" },
+          "ammo": { "type": "integer" }
+        }
+      }
+    },
+    "projectiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "owner_id", "x", "y", "vx", "vy"],
+        "properties": {
+          "id": { "type": "string" },
+          "owner_id": { "type": "string" },
+          "x": { "type": "number" },
+          "y": { "type": "number" },
+          "vx": { "type": "number" },
+          "vy": { "type": "number" },
+          "damage": { "type": "number" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
+

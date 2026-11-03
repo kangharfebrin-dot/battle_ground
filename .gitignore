@@ -38,3 +38,9 @@ Thumbs.db
 # TypeScript build cache
 *.tsbuildinfo
 
+# Godot Engine
+.godot/
+*.translation
+builds/
+
+

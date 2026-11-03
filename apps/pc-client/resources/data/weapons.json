@@ -1,0 +1,45 @@
+{
+  "weapons": {
+    "pistol": {
+      "id": "pistol",
+      "name": "Service Pistol",
+      "slot": 1,
+      "damage": 20,
+      "fire_rate": 4.5,
+      "bullet_speed": 750.0,
+      "bullet_radius": 4.0,
+      "bullet_max_range": 600.0,
+      "magazine_size": 15,
+      "reload_time_sec": 1.2,
+      "spread_deg": 1.5
+    },
+    "assault_rifle": {
+      "id": "assault_rifle",
+      "name": "Combat Rifle",
+      "slot": 2,
+      "damage": 18,
+      "fire_rate": 8.0,
+      "bullet_speed": 900.0,
+      "bullet_radius": 3.5,
+      "bullet_max_range": 800.0,
+      "magazine_size": 30,
+      "reload_time_sec": 1.8,
+      "spread_deg": 3.2
+    },
+    "shotgun": {
+      "id": "shotgun",
+      "name": "Tactical Shotgun",
+      "slot": 3,
+      "damage": 12,
+      "pellets_count": 6,
+      "fire_rate": 1.2,
+      "bullet_speed": 650.0,
+      "bullet_radius": 3.0,
+      "bullet_max_range": 350.0,
+      "magazine_size": 6,
+      "reload_time_sec": 2.2,
+      "spread_deg": 14.0
+    }
+  }
+}
+

@@ -4,6 +4,8 @@
   "private": true,
   "workspaces": [
     "packages/shared",
+    "packages/protocol",
+    "packages/game-data",
     "apps/server",
     "apps/mobile"
   ],

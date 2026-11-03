@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://dm2n4k7l8q3v1"]
+
+[ext_resource type="Script" path="res://scripts/ai/target_dummy.gd" id="1_dummy"]
+[ext_resource type="Script" path="res://scripts/combat/health.gd" id="2_health"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_dummy"]
+radius = 16.0
+
+[node name="TargetDummy" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 5
+motion_mode = 1
+script = ExtResource("1_dummy")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_dummy")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("2_health")
+max_health = 60
+

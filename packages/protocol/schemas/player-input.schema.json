@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PlayerInputMessage",
+  "type": "object",
+  "required": ["seq", "timestamp", "move_x", "move_y", "aim_angle", "is_firing"],
+  "properties": {
+    "seq": { "type": "integer", "minimum": 0 },
+    "timestamp": { "type": "number" },
+    "move_x": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+    "move_y": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+    "aim_angle": { "type": "number" },
+    "is_firing": { "type": "boolean" },
+    "is_sprinting": { "type": "boolean" },
+    "is_dashing": { "type": "boolean" },
+    "weapon_slot": { "type": "integer", "minimum": 1, "maximum": 3 },
+    "reload_requested": { "type": "boolean" }
+  },
+  "additionalProperties": false
+}
+

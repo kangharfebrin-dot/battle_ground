@@ -1,0 +1,10 @@
+{
+  "name": "@battleground/protocol",
+  "version": "0.1.0",
+  "description": "JSON Schema network communication contracts between Battle Ground servers and clients",
+  "main": "index.js",
+  "scripts": {
+    "validate": "node -e \"JSON.parse(require('fs').readFileSync('./schemas/player-input.schema.json')); JSON.parse(require('fs').readFileSync('./schemas/game-state.schema.json')); console.log('Protocol schemas valid.');\""
+  }
+}
+

@@ -1,0 +1,24 @@
+{
+  "arena_id": "arena_alpha",
+  "name": "Alpha Training Ground",
+  "bounds": {
+    "width": 1920,
+    "height": 1080
+  },
+  "player_spawns": [
+    { "x": 300, "y": 540 }
+  ],
+  "bot_spawns": [
+    { "x": 1600, "y": 300 },
+    { "x": 1600, "y": 780 },
+    { "x": 1200, "y": 540 }
+  ],
+  "obstacles": [
+    { "id": "pillar_1", "type": "box", "x": 700, "y": 350, "width": 80, "height": 160 },
+    { "id": "pillar_2", "type": "box", "x": 700, "y": 730, "width": 80, "height": 160 },
+    { "id": "center_bunker", "type": "box", "x": 960, "y": 540, "width": 160, "height": 160 },
+    { "id": "pillar_3", "type": "box", "x": 1220, "y": 350, "width": 80, "height": 160 },
+    { "id": "pillar_4", "type": "box", "x": 1220, "y": 730, "width": 80, "height": 160 }
+  ]
+}
+

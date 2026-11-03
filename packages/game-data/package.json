@@ -1,0 +1,10 @@
+{
+  "name": "@battleground/game-data",
+  "version": "0.1.0",
+  "description": "Shared JSON configurations for Battle Ground game balance, weapons, characters, and maps",
+  "main": "index.js",
+  "scripts": {
+    "validate": "node -e \"JSON.parse(require('fs').readFileSync('./weapons.json')); JSON.parse(require('fs').readFileSync('./character.json')); JSON.parse(require('fs').readFileSync('./arena.json')); console.log('Game data valid.');\""
+  }
+}
+
